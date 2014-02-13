@@ -49,7 +49,7 @@ typedef void (^RMSelectionBlock)(RMPickerViewController *vc, NSArray *selectedRo
   */
 typedef void (^RMCancelBlock)(RMPickerViewController *vc);
 
-@protocol RMPickerViewControllerDelegate <UIPickerViewDelegate, UIPickerViewDataSource>
+@protocol RMPickerViewControllerDelegate <NSObject>
 
 /**
  This delegate method is called when the user selects a certain date.
@@ -66,6 +66,18 @@ typedef void (^RMCancelBlock)(RMPickerViewController *vc);
  @param vc The date selection view controller that just canceled.
  */
 - (void)pickerViewControllerDidCancel:(RMPickerViewController *)vc;
+
+// STAN
+
+- (NSInteger)numberOfComponentsInPicker:(RMPickerViewController *)picker;
+
+- (NSInteger)picker:(RMPickerViewController *)picker numberOfRowsInComponent:(NSInteger)component;
+
+- (NSString *)picker:(RMPickerViewController *)picker titleForRow:(NSInteger)row forComponent:(NSInteger)component;
+
+@optional
+
+- (void)picker:(RMPickerViewController *)picker didSelectRow:(NSInteger)row inComponent:(NSInteger)component;
 
 @end
 
@@ -104,6 +116,11 @@ typedef void (^RMCancelBlock)(RMPickerViewController *vc);
  Used to enable or disable bouncing effects when sliding in the date selection view. Default value is NO.
  */
 @property (assign, nonatomic) BOOL disableBouncingWhenShowing;
+
+// STAN
+
+@property (nonatomic, assign) NSInteger tag;
+@property (nonatomic, assign) NSInteger initiallySelectedRow; // TODO this needs components and rows to be versatile
 
 /// @name Class Methods
 

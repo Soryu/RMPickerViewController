@@ -61,7 +61,7 @@
 #import "RMPickerViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface RMPickerViewController ()
+@interface RMPickerViewController () <UIPickerViewDataSource, UIPickerViewDelegate>
 
 @property (nonatomic, weak) UIViewController *rootViewController;
 
@@ -201,8 +201,8 @@ static NSString *_localizedSelectTitle = @"Select";
     //Instantiate elements
     self.pickerContainer = [[UIView alloc] initWithFrame:CGRectZero];
     self.picker = [[UIPickerView alloc] initWithFrame:CGRectZero];
-    self.picker.delegate = self.delegate;
-    self.picker.dataSource = self.delegate;
+    self.picker.delegate = self;
+    self.picker.dataSource = self;
     
     self.cancelAndSelectButtonContainer = [[UIView alloc] initWithFrame:CGRectZero];
     self.cancelAndSelectButtonSeperator = [[UIView alloc] initWithFrame:CGRectZero];
@@ -248,6 +248,8 @@ static NSString *_localizedSelectTitle = @"Select";
     self.selectButton.layer.cornerRadius = 5;
     self.selectButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.selectButton setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+  
+  [self.picker selectRow:self.initiallySelectedRow inComponent:0 animated:NO];
 }
 
 - (void)setupConstraints {
@@ -349,9 +351,10 @@ static NSString *_localizedSelectTitle = @"Select";
 - (void)setDelegate:(id<RMPickerViewControllerDelegate>)newDelegate {
     if(newDelegate != _delegate) {
         _delegate = newDelegate;
-        
-        self.picker.delegate = newDelegate;
-        self.picker.dataSource = newDelegate;
+
+//        STAN
+//        self.picker.delegate = newDelegate;
+//        self.picker.dataSource = newDelegate;
     }
 }
 
@@ -474,6 +477,31 @@ static NSString *_localizedSelectTitle = @"Select";
         self.cancelBlock(self);
     }
     [self performSelector:@selector(dismiss) withObject:nil afterDelay:0.1];
+}
+
+#pragma mark UIPickerViewDataSource
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+  return [self.delegate numberOfComponentsInPicker:self];
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
+{
+  return [self.delegate picker:self numberOfRowsInComponent:component];
+}
+
+#pragma mark UIPickerViewDelegate
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+  return [self.delegate picker:self titleForRow:row forComponent:component];
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+{
+  if ([self.delegate respondsToSelector:@selector(picker:didSelectRow:inComponent:)])
+    [self.delegate picker:self didSelectRow:row inComponent:component];
 }
 
 @end
